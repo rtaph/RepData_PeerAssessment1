@@ -4,15 +4,33 @@ output:
   html_document:
     keep_md: true
 ---
-
+```{r global_options, include=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE) ## set global parameter for echo
+options(scipen = 1, digits = 2)
+```
 
 ## Loading and preprocessing the data
+```{r}
+  setwd("~/datasciencecoursera/RepData_PeerAssessment1/")
 
-
+  file    = unz("activity.zip","activity.csv")
+  classes = c("numeric","Date","numeric")
+  full    = read.csv(file, colClasses = classes)
+  df      = full[complete.cases(full),]
+```
 
 ## What is mean total number of steps taken per day?
 
+Information on daily steps is given by
+```{r}
+  dailysteps  = tapply(df$steps,df$date,sum)
+  hist(dailysteps)
+  (meansteps   = mean(dailysteps))
+  (medsteps    = median(dailysteps))
+```
 
+The median number of steps is `r round(meansteps,0)` and the median is `r round(medsteps,0)`.
 
 ## What is the average daily activity pattern?
 
