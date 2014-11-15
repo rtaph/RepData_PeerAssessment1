@@ -233,7 +233,7 @@ We run the same code as in question one, but on the data set that includes imput
   plot(h2, col="grey", main = "Comparison of Histograms",
        xlab = "Number of Steps", ylab = "Frequency of Days")
   plot(h1, col="steelblue", add=T)
-  legend("topright", c("imputed set", "original set"), fill=c("grey","steelblue"))
+  legend("topright", c("with imputed", "original data"), fill=c("grey","steelblue"))
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-11-1.png) 
@@ -245,11 +245,14 @@ We run the same code as in question one, but on the data set that includes imput
   meanval    = rbind(meansteps,mean(dailysteps2))
   medianval  = rbind(medsteps,median(dailysteps2))
   meancomparsion = data.frame(meanval,medianval)
-  (row.names(meancomparsion) = c("original","imputed"))
+  row.names(meancomparsion) = c("original data","with imputed")
+  meancomparsion
 ```
 
 ```
-## [1] "original" "imputed"
+##               meanval medianval
+## original data   10766     10765
+## with imputed    10821     11015
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
