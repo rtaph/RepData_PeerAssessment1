@@ -44,7 +44,7 @@ A visual presentation of the daily steps can be given by
 ```r
   dailysteps  = tapply(d$steps,d$date,sum)
   h1 = hist(dailysteps, breaks = 15, plot=FALSE)
-  plot(h1, main = "Histogram of Daily Steps (Original)", col=rgb(0,.5,.7,1),
+  plot(h1, main = "Histogram of Daily Steps (Original)", col="steelblue",
        xlab = "Number of Steps", ylab = "Frequency of Days")
 ```
 
@@ -230,11 +230,10 @@ We run the same code as in question one, but on the data set that includes imput
   h2 = hist(dailysteps2, breaks = 15, plot=FALSE)
   
   ## plot both histograms superimposed over one another
-  plot(h2, col=rgb(0,0,0,1/4), main = "Comparison of Histograms",
+  plot(h2, col="grey", main = "Comparison of Histograms",
        xlab = "Number of Steps", ylab = "Frequency of Days")
-  plot(h1, col=rgb(0,.5,.7,1), add=T)
-  legend("topright", c("imputed set", "original set"), 
-         fill=c(col=rgb(0,0,0,1/4), rgb(0,.5,.7,1)))
+  plot(h1, col="steelblue", add=T)
+  legend("topright", c("imputed set", "original set"), fill=c("grey","steelblue"))
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-11-1.png) 
