@@ -4,6 +4,9 @@ title: "Reproducible Research: Peer Assessment 1"
 ---
 ```{r global_options, include=FALSE}
 library(knitr)
+library(ggplot2)
+library(scales)
+library(lattice)
 opts_chunk$set(echo=TRUE)       ## set global parameter for echo
 options(scipen = 1, digits = 2) ## set rounding defaults
 ```
@@ -25,15 +28,15 @@ options(scipen = 1, digits = 2) ## set rounding defaults
   full    = full[,c(1,4)]
 
   ## subset data to complete cases (exclude NAs)
-  df      = full[complete.cases(full),]
+  d      = na.omit(full)
 ```
 
 ## What is mean total number of steps taken per day?
 
 A visual presentation of the daily steps can be given by
 ```{r}
-  dailysteps  = tapply(df$steps,as.Date(df$dt),sum)
-  hist(dailysteps,main = "Histogram of Daily Steps")
+  dailysteps  = tapply(d$steps,as.Date(d$dt),sum)
+  hist(dailysteps,main = "Histogram of Daily Steps", xlab = "Daily Steps")
   (meansteps   = mean(dailysteps))
   (medsteps    = median(dailysteps))
 ```
@@ -43,15 +46,27 @@ The median number of steps is `r round(meansteps,0)` and the median is `r round(
 ## What is the average daily activity pattern?
 
 ```{r}
-  avgpat  = tapply(df$steps,df$dt,mean)
-  plot(avgpat,type="l",ylab="Average Number of Steps",
-       xlab="Time Interval")
-  maxint = which.max(avgpat)
-  points(835,avgpat[835],col="red",pch=20)
-  points(104,avgpat[104],col="blue",pch=20)
+  ## make summary data frame
+  avgpat = aggregate(d$steps,list(as.numeric(format(d$dt,"%H%M"))),mean)
+
+  ## plot daily activity
+  plot(avgpat, type="l", ylab="Number of Steps", xlab="",
+       main="Average Number of Steps on a Given Day", axes = FALSE)
+  axis(side = 1, at = c(0,600,1200,1800,2355),
+       labels = c("midnight","6am","noon","6pm","midnight"))
+  axis(side = 2)
+
+  ## identify the highest point
+  maxint = which.max(avgpat[[2]])
+  x = avgpat[[1]][maxint]
+  y = avgpat[[2]][maxint]
+  maxtime = format(strptime(sprintf("%04d",x),"%H%M"),"%l:%M%p")
+  points(x,y,col="red",pch=20)
+  maxlab = paste(round(y,0),"steps,",maxtime)
+  text(x,y,labels = maxlab, pos=4, col="red")
 ```
 
-The code of of the interval with the average highest number of steps is `r maxint` 
+Average activity peaks at `r maxtime` with `r maxint` steps.
 
 ## Imputing missing values
 
