@@ -4,13 +4,16 @@ output:
   html_document:
     keep_md: true
 ---
-```{r global_options, include=FALSE}
+```{r global_options}
 library(knitr); library(ggplot2); library(car)
 opts_chunk$set(echo=TRUE)       ## set global parameter for echo
 options(scipen = 1, digits = 2) ## set rounding defaults
 ```
 
 ## Loading and preprocessing the data
+
+We begin by reading-in the data and processing the variables for easier use: 
+
 ```{r}
   ## set the working directory
   setwd("~/datasciencecoursera/RepData_PeerAssessment1/")
@@ -73,7 +76,7 @@ The median number of steps is `r round(meansteps,0)` and the median is `r round(
   text(x,y,labels = maxlab, pos=4, col="red")
 ```
 
-Average activity peaks at `r maxtime` with `r maxint` steps.
+Average activity peaks at `r maxtime` with `r avgpat[[2]][maxint]` steps.
 
 
 ## Imputing missing values

@@ -1,7 +1,15 @@
 # Reproducible Research: Peer Assessment 1
 
+```r
+library(knitr); library(ggplot2); library(car)
+opts_chunk$set(echo=TRUE)       ## set global parameter for echo
+options(scipen = 1, digits = 2) ## set rounding defaults
+```
 
 ## Loading and preprocessing the data
+
+We begin by reading-in the data and processing the variables for easier use: 
+
 
 ```r
   ## set the working directory
@@ -85,7 +93,7 @@ The median number of steps is 10766 and the median is 10765.
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
 
-Average activity peaks at  8:35am with 104 steps.
+Average activity peaks at  8:35am with 206.17 steps.
 
 
 ## Imputing missing values
