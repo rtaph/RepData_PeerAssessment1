@@ -230,10 +230,9 @@ We run the same code as in question one, but on the data set that includes imput
   h2 = hist(dailysteps2, breaks = 15, plot=FALSE)
   
   ## plot both histograms superimposed over one another
-  plot(h2, col=rgb(0,0,0,1/4), ylim=c(1,20), 
-       main = "Comparison of Histograms",
+  plot(h2, col=rgb(0,0,0,1/4), main = "Comparison of Histograms",
        xlab = "Number of Steps", ylab = "Frequency of Days")
-  plot(h1, col=rgb(0,.5,.7,1), ylim=c(1,20), add=T)
+  plot(h1, col=rgb(0,.5,.7,1), add=T)
   legend("topright", c("imputed set", "original set"), 
          fill=c(col=rgb(0,0,0,1/4), rgb(0,.5,.7,1)))
 ```
