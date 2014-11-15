@@ -56,20 +56,54 @@ The median number of steps is `r round(meansteps,0)` and the median is `r round(
        labels = c("midnight","6am","noon","6pm","midnight"))
   axis(side = 2)
 
-  ## identify the highest point
+  ## identify and plot the highest point
   maxint = which.max(avgpat[[2]])
   x = avgpat[[1]][maxint]
   y = avgpat[[2]][maxint]
   maxtime = format(strptime(sprintf("%04d",x),"%H%M"),"%l:%M%p")
-  points(x,y,col="red",pch=20)
+  points(x,y,col="red",pch=19)
   maxlab = paste(round(y,0),"steps,",maxtime)
   text(x,y,labels = maxlab, pos=4, col="red")
 ```
 
 Average activity peaks at `r maxtime` with `r maxint` steps.
 
+
 ## Imputing missing values
 
+1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
+```{r}
+  m1 = sum(is.na(full))       # method 1
+  (m2 = nrow(full) - nrow(d)) # method 2
+  identical(m1, m2)           # check that both produce the same result
+```
+There are a total of `r m1` incomplete observations.
+
+2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+
+Before we attempt to impute data, we should explore the missing data to try to identify patterns.
+
+```{r}
+missing = full[is.na(full),]
+par(mfrow=c(1,2))
+hist(missing$dt[[3]],main = "Missing data by hour", xlab = "hour")
+hist(missing$dt,breaks = "day",main = "Missing data by date", xlab = "date")
+```
+
+The first histogram suggest that missingness does not seems to follow hourly patterns (since these fairly uniformly distributed). Instead, the second histogram suggests that it is likely most missing data originates from a lack of data during entire days. These are presumably days when the device was off and not taking measurements.
+
+
+```{r}
+#biocLite("impute") # source("http://bioconductor.org/biocLite.R")
+
+```
+3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
+
+4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+
+2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). The plot should look something like the following, which was created using simulated data:
