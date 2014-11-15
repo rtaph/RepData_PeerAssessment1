@@ -10,13 +10,21 @@ options(scipen = 1, digits = 2) ## set rounding defaults
 
 ## Loading and preprocessing the data
 ```{r}
+  ## set the working directory
   setwd("~/datasciencecoursera/RepData_PeerAssessment1/")
 
+  ## read the full file
   file    = unz("activity.zip","activity.csv")
   classes = c("numeric","Date","numeric")
   full    = read.csv(file, colClasses = classes)
-  full$dt = paste(full$date,full$interval)
-  full$dt1 = as.POSIXct(full$dt,format="%Y-%m-%d %H:%M:%S")
+
+  ## consolidate date and time into a single variable
+  full$dt = formatC(full$interval, width = 4, format = "d", flag = "0") 
+  full$dt = paste(full$date,full$dt)
+  full$dt = as.POSIXlt(full$dt,format="%Y-%m-%d %H%M")
+  full    = full[,c(1,4)]
+
+  ## subset data to complete cases (exclude NAs)
   df      = full[complete.cases(full),]
 ```
 
@@ -24,8 +32,8 @@ options(scipen = 1, digits = 2) ## set rounding defaults
 
 A visual presentation of the daily steps can be given by
 ```{r}
-  dailysteps  = tapply(df$steps,df$date,sum)
-  hist(dailysteps)
+  dailysteps  = tapply(df$steps,as.Date(df$dt),sum)
+  hist(dailysteps,main = "Histogram of Daily Steps")
   (meansteps   = mean(dailysteps))
   (medsteps    = median(dailysteps))
 ```
@@ -35,7 +43,7 @@ The median number of steps is `r round(meansteps,0)` and the median is `r round(
 ## What is the average daily activity pattern?
 
 ```{r}
-  avgpat  = tapply(df$steps,as.factor(df$interval),mean)
+  avgpat  = tapply(df$steps,df$dt,mean)
   plot(avgpat,type="l",ylab="Average Number of Steps",
        xlab="Time Interval")
   maxint = which.max(avgpat)
