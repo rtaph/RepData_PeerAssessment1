@@ -93,7 +93,7 @@ The median number of steps is 10766 and the median is 10765.
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
 
-Average activity peaks at  8:35am with 206.17 steps.
+Average activity peaks at  8:35am with 206 steps.
 
 
 ## Imputing missing values

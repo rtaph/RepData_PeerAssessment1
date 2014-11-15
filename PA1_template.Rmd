@@ -76,7 +76,7 @@ The median number of steps is `r round(meansteps,0)` and the median is `r round(
   text(x,y,labels = maxlab, pos=4, col="red")
 ```
 
-Average activity peaks at `r maxtime` with `r avgpat[[2]][maxint]` steps.
+Average activity peaks at `r maxtime` with `r round(avgpat[[2]][maxint],0)` steps.
 
 
 ## Imputing missing values
