@@ -6,8 +6,8 @@ output:
 ---
 ```{r global_options, include=FALSE}
 library(knitr)
-opts_chunk$set(echo=TRUE) ## set global parameter for echo
-options(scipen = 1, digits = 2)
+opts_chunk$set(echo=TRUE)       ## set global parameter for echo
+options(scipen = 1, digits = 2) ## set rounding defaults
 ```
 
 ## Loading and preprocessing the data
@@ -22,7 +22,7 @@ options(scipen = 1, digits = 2)
 
 ## What is mean total number of steps taken per day?
 
-Information on daily steps is given by
+A visual presentation of the daily steps can be given by
 ```{r}
   dailysteps  = tapply(df$steps,df$date,sum)
   hist(dailysteps)
@@ -34,6 +34,11 @@ The median number of steps is `r round(meansteps,0)` and the median is `r round(
 
 ## What is the average daily activity pattern?
 
+```{r}
+  avgpat  = tapply(df$steps,as.factor(df$interval),mean)
+  plot(avgpat,type="l")
+
+```
 
 
 ## Imputing missing values
