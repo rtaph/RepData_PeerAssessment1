@@ -326,4 +326,4 @@ xyplot(steps~int|wkd, type="l", data=bywkd, layout=c(1,2))
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-15-1.png) 
 
-There are clearly patterns that unite these cases. For example, it is more common to be a high spike in activity early in the day on weekdays. In contrast, activity seems to be higher during weekends, paticularily later in the day.
+There are clearly patterns based on this factor. For example, it is more common for there to be a high spike in activity early in the day on weekdays. In contrast, activity seems to be higher during weekends, paticularily in the afternoon to evening.
