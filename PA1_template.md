@@ -1,14 +1,14 @@
 # Reproducible Research: Peer Assessment 1
 
 ```r
-library(knitr); library(ggplot2); library(car)
+library(knitr); library(ggplot2); library(car); library(lattice)
 opts_chunk$set(echo=TRUE)       ## set global parameter for echo
 options(scipen = 1, digits = 2) ## set rounding defaults
 ```
 
 ## Loading and preprocessing the data
 
-We begin by reading-in the data and processing the variables for easier use: 
+We begin by reading-in the data and processing the variables easy manipulation: 
 
 
 ```r
@@ -21,10 +21,14 @@ We begin by reading-in the data and processing the variables for easier use:
   full    = read.csv(file, colClasses = classes)
 
   ## consolidate date and time into a single variable
-  full$interval = formatC(full$interval, width = 4, format = "d", flag = "0") 
   full$int = as.numeric(full$interval)
-  full$dt  = paste(full$date,full$interval)
+  full$dt  = paste(full$date,sprintf("%04d", as.integer(full$interval)))
   full$dt  = as.POSIXlt(full$dt,format="%Y-%m-%d %H%M")
+  ftime = function(vec){
+    vec = as.integer(vec)
+    sprintf("%02d:%02d", vec%/%100, vec%%100)
+  }
+  full = full[,-3]
 
   ## add modular variables for easier access
   full$day  = as.factor(weekdays(full$dt))
@@ -196,13 +200,13 @@ head(missing)
 ```
 
 ```
-##   steps       date interval int                  dt    day hour     wkd
-## 1   1.4 2012-10-01     0000   0 2012-10-01 00:00:00 Monday    0 weekday
-## 2   0.0 2012-10-01     0005   5 2012-10-01 00:05:00 Monday    0 weekday
-## 3   0.0 2012-10-01     0010  10 2012-10-01 00:10:00 Monday    0 weekday
-## 4   0.0 2012-10-01     0015  15 2012-10-01 00:15:00 Monday    0 weekday
-## 5   0.0 2012-10-01     0020  20 2012-10-01 00:20:00 Monday    0 weekday
-## 6   5.0 2012-10-01     0025  25 2012-10-01 00:25:00 Monday    0 weekday
+##   steps       date int                  dt    day hour     wkd
+## 1   1.4 2012-10-01   0 2012-10-01 00:00:00 Monday    0 weekday
+## 2   0.0 2012-10-01   5 2012-10-01 00:05:00 Monday    0 weekday
+## 3   0.0 2012-10-01  10 2012-10-01 00:10:00 Monday    0 weekday
+## 4   0.0 2012-10-01  15 2012-10-01 00:15:00 Monday    0 weekday
+## 5   0.0 2012-10-01  20 2012-10-01 00:20:00 Monday    0 weekday
+## 6   5.0 2012-10-01  25 2012-10-01 00:25:00 Monday    0 weekday
 ```
 >3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
@@ -259,9 +263,35 @@ We run the same code as in question one, but on the data set that includes imput
 
 >1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 
+This factor variable was made in the preprossessing stage.
+
+
+```r
+  table(fullplus$wkd)
+```
+
+```
+## 
+## weekday weekend 
+##   12960    4608
+```
+
+
+>2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+
+
+```r
+bywkd  = aggregate(steps~int+wkd, fullplus, mean)
+xyplot(steps~int|wkd, type="l", data=bywkd, layout=c(1,2))
+```
+
+![](./PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
+
 
 ```r
 bywkd  = aggregate(steps~int+wkd, data=full, mean, na.rm=TRUE)
+bywkd$lab = formatC(bywkd$int, width = 4, format = "d", flag = "0")
+
 
 ## plot by weekend/weekday
 library(splines)
@@ -271,7 +301,4 @@ bwd +stat_smooth(aes(group=wkd),se=F,size=1.5,
                  method="lm",formula =y~ns(x,20))
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-13-1.png) 
-
-
->2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). The plot should look something like the following, which was created using simulated data:
+![](./PA1_template_files/figure-html/unnamed-chunk-15-1.png) 

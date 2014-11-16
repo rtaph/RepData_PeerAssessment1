@@ -5,14 +5,14 @@ output:
     keep_md: true
 ---
 ```{r global_options}
-library(knitr); library(ggplot2); library(car)
+library(knitr); library(ggplot2); library(car); library(lattice)
 opts_chunk$set(echo=TRUE)       ## set global parameter for echo
 options(scipen = 1, digits = 2) ## set rounding defaults
 ```
 
 ## Loading and preprocessing the data
 
-We begin by reading-in the data and processing the variables for easier use: 
+We begin by reading-in the data and processing the variables easy manipulation: 
 
 ```{r}
   ## set the working directory
@@ -24,10 +24,14 @@ We begin by reading-in the data and processing the variables for easier use:
   full    = read.csv(file, colClasses = classes)
 
   ## consolidate date and time into a single variable
-  full$interval = formatC(full$interval, width = 4, format = "d", flag = "0") 
   full$int = as.numeric(full$interval)
-  full$dt  = paste(full$date,full$interval)
+  full$dt  = paste(full$date,sprintf("%04d", as.integer(full$interval)))
   full$dt  = as.POSIXlt(full$dt,format="%Y-%m-%d %H%M")
+  ftime = function(vec){
+    vec = as.integer(vec)
+    sprintf("%02d:%02d", vec%/%100, vec%%100)
+  }
+  full = full[,-3]
 
   ## add modular variables for easier access
   full$day  = as.factor(weekdays(full$dt))
@@ -182,8 +186,24 @@ We run the same code as in question one, but on the data set that includes imput
 
 >1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 
+This factor variable was made in the preprossessing stage.
+
+```{r}
+  table(fullplus$wkd)
+```
+
+
+>2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+
+```{r}
+bywkd  = aggregate(steps~int+wkd, fullplus, mean)
+xyplot(steps~int|wkd, type="l", data=bywkd, layout=c(1,2))
+```
+
 ```{r}
 bywkd  = aggregate(steps~int+wkd, data=full, mean, na.rm=TRUE)
+bywkd$lab = formatC(bywkd$int, width = 4, format = "d", flag = "0")
+
 
 ## plot by weekend/weekday
 library(splines)
@@ -192,6 +212,3 @@ bwd = bwd + geom_point(aes(group=wkd),alpha=0.3)
 bwd +stat_smooth(aes(group=wkd),se=F,size=1.5,
                  method="lm",formula =y~ns(x,20))
 ```
-
-
->2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). The plot should look something like the following, which was created using simulated data:
