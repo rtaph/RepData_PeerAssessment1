@@ -325,23 +325,3 @@ xyplot(steps~int|wkd, type="l", data=bywkd, layout=c(1,2))
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-15-1.png) 
-
-Despite the two panels, the granularity of this plot makes it very jagged and hard to compare. I have made an alternative plot below that uses splines to smooth out the patterns, and showcase the differences between weekends/weekdays in a single plot. 
-
-
-```r
-bywkd  = aggregate(steps~int+wkd, data=full, mean, na.rm=TRUE)
-bywkd$lab = formatC(bywkd$int, width = 4, format = "d", flag = "0")
-
-
-## plot by weekend/weekday
-library(splines)
-bwd = ggplot(bywkd, aes(x=int,y=steps,colour=wkd))
-bwd = bwd + geom_point(aes(group=wkd),alpha=0.3)
-bwd +stat_smooth(aes(group=wkd),se=F,size=1.5,
-                 method="lm",formula =y~ns(x,20))
-```
-
-![](./PA1_template_files/figure-html/unnamed-chunk-16-1.png) 
-
-It is interesting to observe that the two lines follow similar peaks and troughs, but that these fluctuate more along extremes on weekdays. We can also deduce that daily activity is highly modular.
