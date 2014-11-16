@@ -10,7 +10,7 @@ options(scipen = 1, digits = 2) ## set rounding defaults
 
 ## Loading and preprocessing the data
 
-We then reading-in the data and pre-process the variables for easy manipulation: 
+We then read-in the data and pre-process the variables for easy manipulation: 
 
 
 ```r
@@ -43,7 +43,7 @@ We then reading-in the data and pre-process the variables for easy manipulation:
 
 >1. Make a histogram of the total number of steps taken each day
 
-A visual presentation of the daily steps can be given by
+A visual presentation of the daily steps can be given by a histogram:
 
 ```r
   ## make histogram
@@ -54,6 +54,9 @@ A visual presentation of the daily steps can be given by
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
+>2. Calculate and report the mean and median total number of steps taken per day
+
 
 ```r
   ## print mean and median
@@ -71,8 +74,6 @@ A visual presentation of the daily steps can be given by
 ```
 ## [1] 10765
 ```
-
->2. Calculate and report the mean and median total number of steps taken per day
 
 The mean number of steps is 10766 and the median is 10765.
 
@@ -102,7 +103,7 @@ The mean number of steps is 10766 and the median is 10765.
   text(x,y,labels = maxlab, pos=4, col="red")
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+![](./PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
 
 >2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
@@ -148,7 +149,7 @@ Before we attempt to impute data, we should explore the missing data to try to i
   hist(missing$dt[[7]], main = "by day of the week", xlab = "")
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+![](./PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
 
 The first histogram suggest that missingness does not seems to follow hourly patterns (since these fairly uniformly distributed). The second histogram does not seem to follow any common distribution, nor does it seem to cluster in any sort of definitive way.
 
@@ -161,7 +162,7 @@ Looking at the histogram of missing data by date, however, we can see that missi
   hist(missing$dt,breaks = "day",main = "by date", xlab = "date")
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
+![](./PA1_template_files/figure-html/unnamed-chunk-7-1.png) 
 
 This suggests that them missing data for 5-min intervals is not missing completely at random-- it clusters around specific dates. These are presumably days when the measurement device was off. We can confirm this more accurately by looking at frequency of missing observations by date:
 
@@ -197,7 +198,7 @@ Consequently, it makes sense to impute data on the basis of daily activity patte
   bd + geom_smooth(aes(group=day),se=FALSE,size=1.5,method="loess")
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-8-1.png) 
+![](./PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
 
 The plot suggests that Fridays, Saturdays, and Sundays follow a similar pattern, while other days of the week cluster together differently. This fits expectations, as we would anticipate a person to be up an about later in the day on weekend nights (incl Fridays).
 
@@ -276,7 +277,7 @@ However, if we plot a histogram of each data set and superimpose them on each ot
   legend("topright", c("with imputed", "original data"), fill=c("grey","steelblue"))
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
+![](./PA1_template_files/figure-html/unnamed-chunk-13-1.png) 
 
 The visualization shows that the imputed values add mass to the centre of the distribution and reduce variance. This makes logical sense, as we replaced missing values with average values-- i.e. values that represent central tendancy by definition. We can prove that this method of imputation reduces variance:
 
@@ -324,6 +325,6 @@ bywkd  = aggregate(steps~int+wkd, fullplus, mean)
 xyplot(steps~int|wkd, type="l", data=bywkd, layout=c(1,2))
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-15-1.png) 
+![](./PA1_template_files/figure-html/unnamed-chunk-16-1.png) 
 
 There are clearly patterns based on this factor. For example, it is more common for there to be a high spike in activity early in the day on weekdays. In contrast, activity seems to be higher during weekends, paticularily in the afternoon to evening.

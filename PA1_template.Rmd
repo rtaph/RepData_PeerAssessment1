@@ -14,7 +14,7 @@ options(scipen = 1, digits = 2) ## set rounding defaults
 
 ## Loading and preprocessing the data
 
-We then reading-in the data and pre-process the variables for easy manipulation: 
+We then read-in the data and pre-process the variables for easy manipulation: 
 
 ```{r}
   ## set the working directory
@@ -46,20 +46,22 @@ We then reading-in the data and pre-process the variables for easy manipulation:
 
 >1. Make a histogram of the total number of steps taken each day
 
-A visual presentation of the daily steps can be given by
+A visual presentation of the daily steps can be given by a histogram:
 ```{r}
   ## make histogram
   dailysteps  = tapply(d$steps,d$date,sum)
   h1 = hist(dailysteps, breaks = 15, plot=FALSE)
   plot(h1, main = "Histogram of Daily Steps (Original)", col="steelblue",
        xlab = "Number of Steps", ylab = "Frequency of Days")
+```
 
+>2. Calculate and report the mean and median total number of steps taken per day
+
+```{r}
   ## print mean and median
   (meansteps   = mean(dailysteps))
   (medsteps    = median(dailysteps))
 ```
-
->2. Calculate and report the mean and median total number of steps taken per day
 
 The mean number of steps is `r round(meansteps,0)` and the median is `r round(medsteps,0)`.
 
