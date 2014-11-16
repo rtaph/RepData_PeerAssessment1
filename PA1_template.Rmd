@@ -56,7 +56,7 @@ A visual presentation of the daily steps can be given by
   (medsteps    = median(dailysteps))
 ```
 
-The median number of steps is `r round(meansteps,0)` and the median is `r round(medsteps,0)`.
+The mean number of steps is `r round(meansteps,0)` and the median is `r round(medsteps,0)`.
 
 ## What is the average daily activity pattern?
 

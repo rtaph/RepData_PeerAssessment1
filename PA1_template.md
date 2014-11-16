@@ -70,7 +70,7 @@ A visual presentation of the daily steps can be given by
 ## [1] 10765
 ```
 
-The median number of steps is 10766 and the median is 10765.
+The mean number of steps is 10766 and the median is 10765.
 
 ## What is the average daily activity pattern?
 
