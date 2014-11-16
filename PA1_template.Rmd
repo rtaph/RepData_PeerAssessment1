@@ -158,11 +158,23 @@ sum(is.na(fullplus))      ## check that there are zero missing values
 
 >4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-We run the same code as in question one, but on the data set that includes imputed values: 
+We compare each dataset with a simple analysis of their means and medians.
+
+```{r}
+  dailysteps2  = tapply(fullplus$steps, fullplus$date,sum)
+  meanval    = rbind(meansteps,mean(dailysteps2))
+  medianval  = rbind(medsteps,median(dailysteps2))
+  meancomparsion = data.frame(meanval,medianval)
+  row.names(meancomparsion) = c("original data","with imputed")
+  meancomparsion
+```
+
+We observe that the means and medians are very similar between the datasets. Had we imputed on the basis of averages regardless of day of the week, the mean would even have been the same. On the face of it, it looks like not much has changed.
+
+However, if we plot a histogram of each data set and superimpose them on each other, we observe the following:
 
 ```{r}
   ## create histogram object with imputed data set
-  dailysteps2  = tapply(fullplus$steps,fullplus$date,sum)
   h2 = hist(dailysteps2, breaks = 15, plot=FALSE)
   
   ## plot both histograms superimposed over one another
@@ -172,15 +184,13 @@ We run the same code as in question one, but on the data set that includes imput
   legend("topright", c("with imputed", "original data"), fill=c("grey","steelblue"))
 ```
 
-
+The visualization shows that the imputed values add mass to the centre of the distribution and reduce variance. This makes logical sense, as we replaced missing values with average values-- i.e. values that represent central tendancy by definition. We can prove that the variance is brought down through imputation:
 
 ```{r}
-  meanval    = rbind(meansteps,mean(dailysteps2))
-  medianval  = rbind(medsteps,median(dailysteps2))
-  meancomparsion = data.frame(meanval,medianval)
-  row.names(meancomparsion) = c("original data","with imputed")
-  meancomparsion
+var(d$steps); var(fullplus$steps)
 ```
+
+The consequence is that any subsequent statistical test on the data with imputations will have lower variance. Although the imputation can allow us to run procedure that might otherwise not be possible, the output may bias hypothesis tests and other statistical procedures.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 

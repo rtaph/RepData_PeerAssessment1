@@ -225,27 +225,11 @@ sum(is.na(fullplus))      ## check that there are zero missing values
 
 >4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-We run the same code as in question one, but on the data set that includes imputed values: 
+We compare each dataset with a simple analysis of their means and medians.
 
 
 ```r
-  ## create histogram object with imputed data set
-  dailysteps2  = tapply(fullplus$steps,fullplus$date,sum)
-  h2 = hist(dailysteps2, breaks = 15, plot=FALSE)
-  
-  ## plot both histograms superimposed over one another
-  plot(h2, col="grey", main = "Comparison of Histograms",
-       xlab = "Number of Steps", ylab = "Frequency of Days")
-  plot(h1, col="steelblue", add=T)
-  legend("topright", c("with imputed", "original data"), fill=c("grey","steelblue"))
-```
-
-![](./PA1_template_files/figure-html/unnamed-chunk-11-1.png) 
-
-
-
-
-```r
+  dailysteps2  = tapply(fullplus$steps, fullplus$date,sum)
   meanval    = rbind(meansteps,mean(dailysteps2))
   medianval  = rbind(medsteps,median(dailysteps2))
   meancomparsion = data.frame(meanval,medianval)
@@ -258,6 +242,41 @@ We run the same code as in question one, but on the data set that includes imput
 ## original data   10766     10765
 ## with imputed    10821     11015
 ```
+
+We observe that the means and medians are very similar between the datasets. Had we imputed on the basis of averages regardless of day of the week, the mean would even have been the same. On the face of it, it looks like not much has changed.
+
+However, if we plot a histogram of each data set and superimpose them on each other, we observe the following:
+
+
+```r
+  ## create histogram object with imputed data set
+  h2 = hist(dailysteps2, breaks = 15, plot=FALSE)
+  
+  ## plot both histograms superimposed over one another
+  plot(h2, col="grey", main = "Comparison of Histograms",
+       xlab = "Number of Steps", ylab = "Frequency of Days")
+  plot(h1, col="steelblue", add=T)
+  legend("topright", c("with imputed", "original data"), fill=c("grey","steelblue"))
+```
+
+![](./PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
+
+The visualization shows that the imputed values add mass to the centre of the distribution and reduce variance. This makes logical sense, as we replaced missing values with average values-- i.e. values that represent central tendancy by definition. We can prove that the variance is brought down through imputation:
+
+
+```r
+var(d$steps); var(fullplus$steps)
+```
+
+```
+## [1] 12543
+```
+
+```
+## [1] 11321
+```
+
+The consequence is that any subsequent statistical test on the data with imputations will have lower variance. Although the imputation can allow us to run procedure that might otherwise not be possible, the output may bias hypothesis tests and other statistical procedures.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -285,7 +304,7 @@ bywkd  = aggregate(steps~int+wkd, fullplus, mean)
 xyplot(steps~int|wkd, type="l", data=bywkd, layout=c(1,2))
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
+![](./PA1_template_files/figure-html/unnamed-chunk-15-1.png) 
 
 
 ```r
@@ -301,4 +320,4 @@ bwd +stat_smooth(aes(group=wkd),se=F,size=1.5,
                  method="lm",formula =y~ns(x,20))
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-15-1.png) 
+![](./PA1_template_files/figure-html/unnamed-chunk-16-1.png) 
