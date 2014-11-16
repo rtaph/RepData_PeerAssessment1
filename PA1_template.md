@@ -316,7 +316,7 @@ This factor variable was made in the preprossessing stage.
 
 >2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 
-The pattern of activity is plotted below according to the weekday or weekend. Ther are clearly patterns that unite these cases.
+The pattern of activity is plotted below according to the weekday or weekend.
 
 
 ```r
@@ -325,3 +325,5 @@ xyplot(steps~int|wkd, type="l", data=bywkd, layout=c(1,2))
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-15-1.png) 
+
+There are clearly patterns that unite these cases. For example, it is more common to be a high spike in activity early in the day on weekdays. In contrast, activity seems to be higher during weekends, paticularily later in the day.
