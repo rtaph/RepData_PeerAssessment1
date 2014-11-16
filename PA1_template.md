@@ -1,5 +1,7 @@
 # Reproducible Research: Peer Assessment 1
 
+We begin by loading libraries and setting a few global parameters:
+
 ```r
 library(knitr); library(ggplot2); library(car); library(lattice)
 opts_chunk$set(echo=TRUE)       ## set global parameter for echo
@@ -8,7 +10,7 @@ options(scipen = 1, digits = 2) ## set rounding defaults
 
 ## Loading and preprocessing the data
 
-We begin by reading-in the data and processing the variables easy manipulation: 
+We then reading-in the data and pre-process the variables for easy manipulation: 
 
 
 ```r
@@ -24,15 +26,11 @@ We begin by reading-in the data and processing the variables easy manipulation:
   full$int = as.numeric(full$interval)
   full$dt  = paste(full$date,sprintf("%04d", as.integer(full$interval)))
   full$dt  = as.POSIXlt(full$dt,format="%Y-%m-%d %H%M")
-  ftime = function(vec){
-    vec = as.integer(vec)
-    sprintf("%02d:%02d", vec%/%100, vec%%100)
-  }
   full = full[,-3]
 
   ## add modular variables for easier access
   full$day  = as.factor(weekdays(full$dt))
-  full$hour = full$dt[[3]]
+  full$hour = as.numeric(full$dt[[3]])
   full$wkd  = full$day %in% c("Saturday","Sunday") # as logical
   full$wkd  = recode(full$wkd, "TRUE='weekend';else='weekday'", 
                       as.factor.result=TRUE)       # as factor
@@ -43,9 +41,12 @@ We begin by reading-in the data and processing the variables easy manipulation:
 
 ## What is mean total number of steps taken per day?
 
+>1. Make a histogram of the total number of steps taken each day
+
 A visual presentation of the daily steps can be given by
 
 ```r
+  ## make histogram
   dailysteps  = tapply(d$steps,d$date,sum)
   h1 = hist(dailysteps, breaks = 15, plot=FALSE)
   plot(h1, main = "Histogram of Daily Steps (Original)", col="steelblue",
@@ -55,6 +56,7 @@ A visual presentation of the daily steps can be given by
 ![](./PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
 
 ```r
+  ## print mean and median
   (meansteps   = mean(dailysteps))
 ```
 
@@ -70,9 +72,13 @@ A visual presentation of the daily steps can be given by
 ## [1] 10765
 ```
 
+>2. Calculate and report the mean and median total number of steps taken per day
+
 The mean number of steps is 10766 and the median is 10765.
 
 ## What is the average daily activity pattern?
+
+>1. Make a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
 
 ```r
@@ -98,6 +104,8 @@ The mean number of steps is 10766 and the median is 10765.
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
 
+>2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
 Average activity peaks at  8:35am with 206 steps.
 
 
@@ -109,6 +117,7 @@ There are a number of methods to calculate the number of missing values. Two app
 
 
 ```r
+  ## calculate number of missing observations
   m1 = sum(is.na(full))       # method 1
   (m2 = nrow(full) - nrow(d)) # method 2
 ```
@@ -132,10 +141,11 @@ Before we attempt to impute data, we should explore the missing data to try to i
 
 
 ```r
-missing = full[is.na(full),]
-par(mfrow=c(1,2))
-hist(missing$dt[[3]], main= "by hour of the day", xlab = "")
-hist(missing$dt[[7]], main = "by day of the week", xlab = "",)
+  ## plot missing data, broken down by hour and day of the week
+  missing = full[is.na(full),]
+  par(mfrow=c(1,2))
+  hist(missing$dt[[3]], main = "by hour of the day", xlab = "")
+  hist(missing$dt[[7]], main = "by day of the week", xlab = "")
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
@@ -146,8 +156,9 @@ Looking at the histogram of missing data by date, however, we can see that missi
 
 
 ```r
-par(mfrow=c(1,1))
-hist(missing$dt,breaks = "day",main = "by date", xlab = "date")
+  ## plot missing data, by date
+  par(mfrow=c(1,1))
+  hist(missing$dt,breaks = "day",main = "by date", xlab = "date")
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
@@ -156,7 +167,8 @@ This suggests that them missing data for 5-min intervals is not missing complete
 
 
 ```r
-(misslist = as.data.frame(table(missing$date)))
+  ## summary of data by weekend/weekday
+  (misslist = as.data.frame(table(missing$date)))
 ```
 
 ```
@@ -177,26 +189,28 @@ Consequently, it makes sense to impute data on the basis of daily activity patte
 
 
 ```r
-byday  = aggregate(steps~int+day, data = full, mean, na.rm=TRUE)
-
-# plot by day
-bd = ggplot(byday, aes(x=int,y=steps,colour=day))
-bd + geom_smooth(aes(group=day),se=FALSE,size=1.5,method="loess")
+  ## Create a dataframe with averages
+  byday  = aggregate(steps~int+day, data = full, mean, na.rm=TRUE)
+  
+  # plot by day
+  bd = ggplot(byday, aes(x=int,y=steps,colour=day))
+  bd + geom_smooth(aes(group=day),se=FALSE,size=1.5,method="loess")
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-8-1.png) 
 
-The plot suggests that Fridays, Saturdays, and Sundays follow a similar pattern, while other days of the week share simlar trajectories. This fits expectations, as we would anticipate a person to be up an about later in the day on weekend nights (incl Fridays).
+The plot suggests that Fridays, Saturdays, and Sundays follow a similar pattern, while other days of the week cluster together differently. This fits expectations, as we would anticipate a person to be up an about later in the day on weekend nights (incl Fridays).
 
 The implication for imputation is that the day of the week makes a difference and should be taken into account if we wish to impute more accurate figures. Accordingly, I will chose to impute missing data by swapping-in the average steps for that given day of the week:
 
 
 ```r
-for(i in 1:nrow(missing)){
-  missing[i,"steps"] = byday[byday$int == missing[i,"int"] & 
-                       byday$day == missing[i,"day"],"steps"]
-}
-head(missing)
+  ## impute missing data
+  for(i in 1:nrow(missing)){
+    missing[i,"steps"] = byday[byday$int == missing[i,"int"] & 
+                         byday$day == missing[i,"day"],"steps"]
+  }
+  head(missing)
 ```
 
 ```
@@ -208,15 +222,17 @@ head(missing)
 ## 5   0.0 2012-10-01  20 2012-10-01 00:20:00 Monday    0 weekday
 ## 6   5.0 2012-10-01  25 2012-10-01 00:25:00 Monday    0 weekday
 ```
+
 >3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
 We simply merge the two data frame and re-sort them:
 
 
 ```r
-fullplus = rbind(d,missing)
-fullplus = fullplus[order(fullplus$dt),]
-sum(is.na(fullplus))      ## check that there are zero missing values
+  ## consolidate all data sources into a single frame
+  fullplus = rbind(d,missing)
+  fullplus = fullplus[order(fullplus$dt),]
+  sum(is.na(fullplus))      ## check that there are zero missing values
 ```
 
 ```
@@ -229,6 +245,7 @@ We compare each dataset with a simple analysis of their means and medians.
 
 
 ```r
+  ## plot table of mean/medians
   dailysteps2  = tapply(fullplus$steps, fullplus$date,sum)
   meanval    = rbind(meansteps,mean(dailysteps2))
   medianval  = rbind(medsteps,median(dailysteps2))
@@ -261,11 +278,12 @@ However, if we plot a histogram of each data set and superimpose them on each ot
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
 
-The visualization shows that the imputed values add mass to the centre of the distribution and reduce variance. This makes logical sense, as we replaced missing values with average values-- i.e. values that represent central tendancy by definition. We can prove that the variance is brought down through imputation:
+The visualization shows that the imputed values add mass to the centre of the distribution and reduce variance. This makes logical sense, as we replaced missing values with average values-- i.e. values that represent central tendancy by definition. We can prove that this method of imputation reduces variance:
 
 
 ```r
-var(d$steps); var(fullplus$steps)
+  # check variance
+  var(d$steps); var(fullplus$steps)
 ```
 
 ```
@@ -298,6 +316,8 @@ This factor variable was made in the preprossessing stage.
 
 >2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 
+The pattern of activity is plotted below according to the weekday or weekend. Ther are clearly patterns that unite these cases.
+
 
 ```r
 bywkd  = aggregate(steps~int+wkd, fullplus, mean)
@@ -305,6 +325,8 @@ xyplot(steps~int|wkd, type="l", data=bywkd, layout=c(1,2))
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-15-1.png) 
+
+Despite the two panels, the granularity of this plot makes it very jagged and hard to compare. I have made an alternative plot below that uses splines to smooth out the patterns, and showcase the differences between weekends/weekdays in a single plot. 
 
 
 ```r
@@ -321,3 +343,5 @@ bwd +stat_smooth(aes(group=wkd),se=F,size=1.5,
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-16-1.png) 
+
+It is interesting to observe that the two lines follow similar peaks and troughs, but that these fluctuate more along extremes on weekdays. We can also deduce that daily activity is highly modular.
